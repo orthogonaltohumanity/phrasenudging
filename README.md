@@ -84,6 +84,12 @@ be analyzed separately.
 - `--nudge-temp` — logits temperature *before* softmax → SLERP
 - `--free-temp` — free-window decoding (default 0 = argmax greedy)
 
+## Datasets Used
+- **FEVER** — Thorne et al., NAACL 2018. [arXiv:1803.05355](https://arxiv.org/abs/1803.05355) · [HF](https://huggingface.co/datasets/fever/fever)            
+- **StrategyQA** — Geva et al., TACL 2021. [arXiv:2101.02235](https://arxiv.org/abs/2101.02235) · [project](https://allenai.github.io/strategyqa/)
+- **MATH** — Hendrycks et al., NeurIPS 2021. [arXiv:2103.03874](https://arxiv.org/abs/2103.03874) ·[HF](https://huggingface.co/datasets/hendrycks/competition_math)                                                                                           
+- **ZebraLogic** — Lin et al., ICML 2025. [arXiv:2502.01100](https://arxiv.org/abs/2502.01100) · [HF](https://huggingface.co/datasets/WildEval/ZebraLogic)
+
 ## AI Use Disclosure
 
 I use AI as a research tool — for finding papers, implementing my
