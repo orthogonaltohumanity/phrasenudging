@@ -1,0 +1,18 @@
+# Core numerics (CPU).
+numpy>=1.24
+scipy>=1.10
+scikit-learn>=1.3
+
+# llama-cpp-python: pip install from the default index gives a CPU-ONLY
+# wheel and you will see ~10 tk/s instead of ~150 tk/s. To get the CUDA
+# build, install with CMake args for your CUDA toolkit:
+#
+#   CMAKE_ARGS="-DGGML_CUDA=on" pip install --upgrade --force-reinstall \
+#       --no-cache-dir llama-cpp-python
+#
+# (or pull a prebuilt CUDA wheel from https://github.com/abetlen/llama-cpp-python/releases)
+#
+# We leave the bare package pinned here so `pip install -r requirements.txt`
+# gets something functional; see README "Performance notes" for the GPU
+# install recipe.
+llama-cpp-python>=0.2.72

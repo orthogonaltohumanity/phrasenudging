@@ -1,0 +1,3 @@
+<｜begin▁of▁sentence｜><｜User｜>Claim to verify: Do all cancer patients get disability?
+
+Think step by step, then put your one-word answer (YES / NO) in \boxed{}.<｜Assistant｜><think>

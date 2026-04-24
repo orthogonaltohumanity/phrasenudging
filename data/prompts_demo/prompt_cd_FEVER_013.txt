@@ -1,0 +1,3 @@
+<｜begin▁of▁sentence｜><｜User｜>Claim: Imagine Dragons have a debut performance.
+
+Is this TRUE, FALSE, or UNKNOWN? Put your one-word answer (TRUE / FALSE / UNKNOWN) in \boxed{}.<｜Assistant｜><think>

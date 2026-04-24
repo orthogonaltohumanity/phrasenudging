@@ -1,0 +1,3 @@
+<｜begin▁of▁sentence｜><｜User｜>Claim: There is a movie called Something's Got ta Give where Amanda Peet is part of.
+
+Is this TRUE, FALSE, or UNKNOWN? Put your one-word answer (TRUE / FALSE / UNKNOWN) in \boxed{}.<｜Assistant｜><think>
