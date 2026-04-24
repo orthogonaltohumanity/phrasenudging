@@ -41,8 +41,7 @@ def coverage_topk(P: np.ndarray, coverage: float = 0.999,
         k = max(1, min(k, M))
         return sorted_idx[:k].astype(np.int32), sorted_p[:k].astype(np.float32)
     # fallback: full argsort if the probe_m window didn't reach τ
-    order = np.argsort(-P)
-    ...
+    # ... (omitted)
 ```
 
 A two-stage `argpartition`-then-full-sort avoids the $O(V \log V)$ cost
@@ -77,12 +76,14 @@ $\sum_i p_i = 1 \iff \sum_i a_i^2 = 1$. On this manifold the
 **Bhattacharyya coefficient** between $p$ and $q$ is exactly the
 inner product of their amplitudes,
 $$
-\mathrm{BC}(p, q) \;=\; \sum_i \sqrt{p_i q_i} \;=\; \langle a, b \rangle \;\in\; [0, 1].
+\mathrm{BC}(p, q) \;=\; \sum_i \sqrt{p_i q_i} \;=\; \langle a, b \rangle.
 $$
 
-This is a cosine on $S^{V-1}$, so the angle
-$\theta = \arccos\mathrm{BC}(p,q) \in [0, \pi/2]$ is the geodesic
-distance on the amplitude hypersphere — a proper Riemannian metric.
+Since amplitudes are non-negative, $\langle a, b \rangle \in [0, 1]$ and
+the induced angle
+$\theta = \arccos\mathrm{BC}(p, q) \in [0, \pi/2]$
+is the geodesic distance on the amplitude hypersphere — a proper
+Riemannian metric, restricted to the positive orthant of $S^{V-1}$.
 
 ---
 
@@ -107,8 +108,8 @@ The stored distance is the raw angle
 $$
 d(t, k) \;=\; \arccos\mathrm{BC}_W(A, B;\, t, k) \;\in\; [0, \pi/2]
 $$
-(in radians). We use $\theta$ rather than the sin-angle
-$\sqrt{1 - \mathrm{BC}_W^2}$ or the Hellinger distance
+(in radians). We use $\theta$ rather than the chord distance
+$\sqrt{1 - \mathrm{BC}_W^2} = \sin\theta$ or the Hellinger distance
 $\sqrt{1 - \mathrm{BC}_W}$ because both saturate near $\theta = \pi/2$
 — derivatives vanish — which would cause the downstream Gaussian
 kernel to collapse all near-orthogonal pairs. Raw $\theta$ is linear
@@ -119,7 +120,8 @@ in the angle and keeps the tail discriminative.
 ## 4. Fast pairwise implementation
 
 Let $\Phi_X \in \mathbb{R}^{T_X \times V}$ be the stacked per-token
-amplitude matrix of trajectory $X$ (unit-norm rows). Then
+amplitude matrix of trajectory $X$ (unit-norm rows, stored as
+`scipy.sparse` CSR). Then
 $$
 G \;=\; \Phi_A \Phi_B^\top, \qquad G[a, b] \;=\; \langle a^A_a, a^B_b \rangle,
 $$
@@ -132,6 +134,7 @@ Code (`src/allpairs_bc.py`, `pair_dist_fast`):
 
 ```python
 # Per-token BC matrix: G[a, b] = <a_A[a], a_B[b]> = BC(p_A[a], p_B[b]).
+# Phi_A, Phi_B are scipy.sparse CSR; densify after the matmul.
 G = (Phi_A @ Phi_B.T).astype(np.float32).toarray()
 G = np.clip(G, 0.0, 1.0)
 
@@ -170,9 +173,9 @@ $$
 A_{ij} \;=\; \exp\!\left(-\frac{\Theta_{ij}^2}{2\sigma^2}\right)
 $$
 with $\sigma$ in radians (same units as $\Theta$). The affinity width
-is a manifold-scale knob: $\sigma \ll \mathrm{med}(\Theta)$ gives a
-near-disconnected graph, $\sigma \gg \mathrm{med}(\Theta)$ oversmooths,
-and the intermediate regime exposes cluster structure.
+is a manifold-scale knob: $\sigma$ small relative to $\mathrm{med}(\Theta)$
+gives a near-disconnected graph, $\sigma$ large oversmooths, and the
+intermediate regime exposes cluster structure.
 
 **Spectral clustering.** Given $A$, form the degree matrix
 $D = \mathrm{diag}(A\,\mathbf{1})$ and the normalized Laplacian
@@ -216,11 +219,8 @@ At decode step $t$, let the model's natural next-token distribution be
 $p_t$, with amplitude $a_t = \sqrt{p_t} \in S^{V-1}$. Pick a target
 amplitude $a^*$ from the current cluster's phrase library (a sampled
 phrase's amplitude at the appropriate within-phrase position). The
-angle between them is
-$$
-\theta \;=\; \arccos\langle a_t, a^* \rangle,
-$$
-and for a small $\alpha \in [0, 1]$ the **spherical linear interpolation**
+angle between them is $\theta = \arccos\langle a_t, a^* \rangle$, and
+for a small $\alpha \in [0, 1]$ the **spherical linear interpolation**
 $$
 a'_t \;=\; \frac{\sin((1-\alpha)\theta)}{\sin\theta}\, a_t
         \;+\; \frac{\sin(\alpha\theta)}{\sin\theta}\, a^*
@@ -323,7 +323,7 @@ for _ in range(n_tokens):
     row = T[state]
     cdf_states = np.cumsum(row); cdf_states[-1] = 1.0
     new_state = int(np.searchsorted(cdf_states, rng.random(), side="right"))
-    if new_state > N: new_state = N
+    new_state = min(new_state, N)   # defensive: searchsorted can return N+1 on FP drift
     if new_state != state:
         cur_phrase = None; steps_in_state = 0
     state = new_state
