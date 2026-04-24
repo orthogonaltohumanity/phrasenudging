@@ -1,4 +1,4 @@
-# lens-scaffold-controller
+# Phrase Nudging
 
 Phrase-level inference-time steering for LLMs. Mine W-token "phrases"
 from recorded reasoning trajectories, cluster them on the amplitude
