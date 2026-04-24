@@ -83,3 +83,10 @@ be analyzed separately.
 - `--baseline-temp` — baseline decode (default 0 = argmax greedy)
 - `--nudge-temp` — logits temperature *before* softmax → SLERP
 - `--free-temp` — free-window decoding (default 0 = argmax greedy)
+
+## AI Use Disclosure
+
+I use AI as a research tool — for finding papers, implementing my
+designs in code, and as a thinking aid (I like to think out loud, and
+there's usually no one to talk to at 3 AM when I'm in the middle of a
+work session). I take full responsibility for the code as shared on GitHub.
