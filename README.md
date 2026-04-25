@@ -1,5 +1,10 @@
 # Phrase Nudging
 
+## April 25 2026 Notes: What I'm going to do today
+Today I want to improve the evidence quality for this method, because the evidence is very qualitative and functionally anecdotal. So the plan is to learn about some older natural language processing techniques that don't rely on the backprop algorithm, which is a source of uninterpretabilty. I'll then take these and attempt to demonstrate a quantitative difference between baseline and phrase-nudged LLM token streams.
+
+## Description
+
 Phrase-level inference-time steering for LLMs. Mine W-token "phrases"
 from recorded reasoning trajectories, cluster them on the amplitude
 hypersphere using per-token Bhattacharyya similarity, then SLERP the
